@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -16,7 +18,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource (Login page).
      */
     public function create()
     {
@@ -24,7 +26,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Authenticate the user (Login).
      */
     public function store(Request $request)
     {
@@ -40,24 +42,49 @@ class AuthController extends Controller
             return redirect()->intended('/');
         } else {
             return redirect()->back()
-                ->with('error', 'Invlid credential');
+                ->with('error', 'Invalid credentials');
         }
     }
 
+    /**
+     * Show the registration form.
+     */
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
 
+    /**
+     * Handle user registration.
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/')->with('success', 'Welcome! Your account has been created.');
+    }
+
+    /**
+     * Log the user out.
+     */
     public function destroy()
     {
         Auth::logout();
 
         request()->session()->invalidate();
-        // Ends the current user session.
-        // Deletes all session data from storage.
-        // Changes the session ID so the old one can’t be reused
-           
         request()->session()->regenerateToken();
-        //Generates a new CSRF token for the next request.
-        // Ensures that any previously issued CSRF token becomes invalid.
-        // Protects against Cross-Site Request Forgery after logout or sensitive operations.
         
         return redirect('/');
     }

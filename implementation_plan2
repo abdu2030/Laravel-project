@@ -1,0 +1,93 @@
+# Add Registration, Separate Login, and Landing Page
+
+## Background
+
+Currently the app has only a **login** form (`Auth/create.blade.php`) — there is no way for new users to **sign up**. The root route (`/`) immediately redirects to the jobs listing. The user wants:
+
+1. **Registration (Sign Up)** — a new page where users can create an account (name, email, password, confirm password).
+2. **Login** — keep the existing login form, but link it to the new sign-up page and vice-versa.
+3. **A beautiful landing page** at `/` — when visitors arrive they see a hero section showcasing the job board, with a CTA to browse jobs (`/jobs`).
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> The landing page will become the new `/` home route. Authenticated users will still be able to navigate to `/jobs` via the navbar and the landing page CTA.
+
+> [!IMPORTANT]
+> Registration will create a standard `User` record with `name`, `email`, and `password` — no email verification is added (matching the existing simple auth flow).
+
+---
+
+## Proposed Changes
+
+### Auth — Registration Feature
+
+#### [NEW] [register.blade.php](file:///c:/xampp/htdocs/job-board/resources/views/auth/register.blade.php)
+- Sign-up form with **Name**, **Email**, **Password**, and **Confirm Password** fields.
+- Links to the login page ("Already have an account? Sign in").
+- Uses existing `<x-layout>`, `<x-card>`, `<x-text-input>`, `<x-button>` components.
+
+#### [MODIFY] [create.blade.php](file:///c:/xampp/htdocs/job-board/resources/views/auth/create.blade.php)
+- Add a link at the bottom: "Don't have an account? Sign up" pointing to the register route.
+
+#### [MODIFY] [AuthController.php](file:///c:/xampp/htdocs/job-board/app/Http/Controllers/AuthController.php)
+- Add `showRegister()` — returns the `auth.register` view.
+- Add `register(Request $request)` — validates input, creates the user, logs them in, and redirects to `/`.
+
+---
+
+### Routes
+
+#### [MODIFY] [web.php](file:///c:/xampp/htdocs/job-board/routes/web.php)
+- Change `Route::get('', ...)` to point to a new `landing` view instead of redirecting to `jobs.index`.
+- Add `GET /register` → `AuthController@showRegister` (named `register`).
+- Add `POST /register` → `AuthController@register` (named `register.store`).
+
+---
+
+### Landing Page
+
+#### [NEW] [landing.blade.php](file:///c:/xampp/htdocs/job-board/resources/views/landing.blade.php)
+A visually stunning landing page with:
+- **Hero section** — large headline, subtitle, animated gradient background, CTA button ("Browse Jobs →").
+- **Features section** — three icon cards highlighting the platform's value props (e.g., Smart Search, Employer Dashboard, Quick Apply).
+- **Stats section** — animated counters (jobs posted, companies, applicants).
+- **Footer CTA** — "Ready to find your dream job?" with sign-up / browse buttons.
+
+---
+
+### Styling
+
+#### [MODIFY] [app.css](file:///c:/xampp/htdocs/job-board/public/css/app.css)
+- Add landing page hero styles (gradient, animations, glassmorphism).
+- Add feature-card grid styles.
+- Add subtle keyframe animations (`fadeInUp`, `float`) for entrance effects.
+- Add responsive breakpoints for the landing page.
+
+---
+
+### Navigation
+
+#### [MODIFY] [layout.blade.php](file:///c:/xampp/htdocs/job-board/resources/views/components/layout.blade.php)
+- Update the "Home" link to point to `/` (the landing page).
+- Add a "Jobs" link pointing to `jobs.index`.
+- For guests: show both "Sign In" and "Sign Up" buttons in the navbar.
+
+---
+
+## Open Questions
+
+1. Do you want the landing page to show a few **featured jobs** from the database, or keep it purely a marketing/hero page?
+
+---
+
+## Verification Plan
+
+### Manual Verification
+- Visit `/` → see the landing page with hero, features, CTA.
+- Click "Browse Jobs" → navigated to `/jobs`.
+- Click "Sign Up" → registration form loads, submit creates user and logs in.
+- Click "Sign In" → login form loads, existing flow works.
+- Navbar shows correct links for guests vs. authenticated users.
