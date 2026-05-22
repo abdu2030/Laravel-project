@@ -27,8 +27,6 @@
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
-    "LOG_CHANNEL": "stderr",
-    "DB_CONNECTION": "sqlite",
-    "DB_DATABASE": "database/database.sqlite"
+    "LOG_CHANNEL": "stderr"
   }
 }
