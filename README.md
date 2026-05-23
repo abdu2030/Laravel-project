@@ -49,17 +49,7 @@ php artisan serve
 ```
 Visit `http://127.0.0.1:8000` in your browser to view the application.
 
-## 🌐 Deploying to Vercel
 
-This project is configured out-of-the-box for Vercel using the `vercel-php` community builder. 
-
-1. Import this repository into your Vercel Dashboard.
-2. Under "Build and Output Settings", set the Build Command to `npm run build` and the Output Directory to `public`.
-3. Add your Laravel `.env` variables into Vercel's Environment Variables settings (ensure `APP_ENV=production` and `APP_URL` matches your Vercel domain).
-4. Connect to a remote database (like Supabase, PlanetScale, or Neon) by updating your Vercel `DB_*` variables.
-5. Hit **Deploy**! 
-
-*(Note: You will need to run your migrations against your remote production database locally, as Vercel is a serverless environment.)*
 
 ---
 *Built with Laravel 12.x.*
